@@ -2,7 +2,7 @@
  * @author Ryan Leeder <ryanleeder@gmail.com>
  * @version 1.0.0
  * 
- * Hack to remove spaces from selected option borrowed from
+ * Hack from
  * http://stackoverflow.com/questions/10885866/jquery-remove-spaces-from-selected-state-in-option-dropdown-on-change-event
  */
 
@@ -66,7 +66,8 @@
 			$.each(choices, function() {
 				var choice = this;
 				var item = $('<option/>');
-				item.attr({ 'value': choice.value }).html(Array(4 * (choice.depth - 1)).join(spacer) + choice.newLabel);
+				item.prop({ 'value': choice.value }).html(Array(4 * (choice.depth - 1)).join(spacer) + choice.newLabel);
+				item.prop({ 'selected': choice.selected });
 				selectValues.push(item);
 				lastDepth = choice.depth;
 			});
@@ -80,12 +81,7 @@
 			});
 			var trigger = ($.browser.mozilla) ? 'click' : 'mousedown';
 			$element.on("change", function() {
-				var selected = $('option:selected', this);
-				$(this).data('currentValue', selected);
-				var display = selected.clone();
-				display.text($.trim(display.text()));
-				selected.replaceWith(display);
-				$(this).prop('selectedIndex', display.index());
+				that.trimSelectedOption($element);
 			}).on(trigger, function() {
 				if ($(this).prop('selectedIndex') == 0)
 					return;
@@ -93,6 +89,17 @@
 				selected.replaceWith($(this).data('currentValue'));
 				$(this).prop('selectedIndex', 0);
 			});
+			if ($('option:selected', $element).length > 0) {
+				that.trimSelectedOption($element);
+			}
+		},
+		trimSelectedOption: function ($element) {
+			var selected = $('option:selected', $element);
+			$element.data('currentValue', selected);
+			var display = selected.clone();
+			display.text($.trim(display.text()));
+			selected.replaceWith(display);
+			$element.prop('selectedIndex', display.index());
 		}
 	};
 
